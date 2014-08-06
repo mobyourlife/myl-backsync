@@ -88,7 +88,7 @@ function Start() {
 								if (!albums || albums.error)
 								{
 									console.log('Erro na consulta dos álbuns!');
-									console.log(error);
+									console.log(albums.error);
 									return;
 								}
 								else
@@ -109,7 +109,7 @@ function Start() {
 												if (!photos || photos.error)
 												{
 													console.log('Erro na consulta das fotos!');
-													console.log(error);
+													console.log(photos.error);
 													return;
 												}
 												else
