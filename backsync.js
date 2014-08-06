@@ -82,6 +82,32 @@ function Start() {
 								});
 							}
 							
+							/* Removendo fotos excluídas. */
+							connection.query("SELECT photo_id FROM myl_fb_photos WHERE album_id IN (SELECT album_id FROM myl_fb_albums WHERE page_fbid = " + page_fbid + ");", function (error, rows, columns)
+							{
+								if (error)
+								{
+									console.log('Erro na consulta de fotos excluídas!');
+									console.log(error);
+									return;
+								}
+								else
+								{
+									for (ip = 0; ip < rows.length; ip++)
+									{
+										var rm_id = rows[ip].photo_id;
+										fb.api('/v2.0/' + rm_id, function (photo)
+										{
+											if (!photo || photo.error)
+											{
+												console.log('Foto ' + rm_id + ' foi excluída!');
+												connection.query("DELETE FROM myl_fb_photos WHERE photo_id = " + rm_id + ";");
+											}
+										});
+									}
+								}
+							});
+							
 							/* Sincronizando informações dos álbuns. */
 							fb.api('/v2.0/me/albums', function (albums)
 							{
