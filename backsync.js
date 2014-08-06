@@ -94,7 +94,11 @@ function Start() {
 								{
 									albums.data.forEach(function (a)
 									{
-										console.log('Sincronizando álbum: ' + a.name + ', fotos: ' + a.count);
+										if (a.count)
+										{
+											console.log('Sincronizando álbum: ' + a.name + ', fotos: ' + a.count);
+											connection.query("INSERT INTO myl_fb_albums (page_fbid, album_id, album_type, count, updated_time) VALUES (" + page_fbid + ", " + a.id + ", '" + a.type + "', " + a.count + ", '" + format_date(a.updated_time) + "') ON DUPLICATE KEY UPDATE count = " + a.count + ", updated_time = '" + format_date(a.updated_time) + "';");
+										}
 									});
 								}
 							});
