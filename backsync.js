@@ -42,7 +42,8 @@ function Start() {
 	console.log('');
 			
 			/* Consulta os usuários cadastrados. */
-			connection.query("SELECT admin_uid, page_fbid, access_token FROM myl_accounts;", function (error, rows, columns) {
+			connection.query("SELECT admin_uid, page_fbid, access_token FROM myl_accounts;", function (error, rows, columns)
+			{
 				if (error)
 				{
 					console.log('Erro na consulta dos usuários cadastrados!');
@@ -96,15 +97,33 @@ function Start() {
 									{
 										if (a.count)
 										{
-											console.log('Sincronizando álbum: ' + a.name + ', fotos: ' + a.count);
-											connection.query("INSERT INTO myl_fb_albums (page_fbid, album_id, album_type, count, updated_time) VALUES (" + page_fbid + ", " + a.id + ", '" + a.type + "', " + a.count + ", '" + format_date(a.updated_time) + "') ON DUPLICATE KEY UPDATE count = " + a.count + ", updated_time = '" + format_date(a.updated_time) + "';");
+											console.log('Sincronizando álbum: ' + a.id + ' (' + a.name + '), fotos: ' + a.count);
+											connection.query("INSERT INTO myl_fb_albums (album_id, page_fbid, album_type, count, updated_time) VALUES (" + a.id + ", " + page_fbid + ", '" + a.type + "', " + a.count + ", '" + format_date(a.updated_time) + "') ON DUPLICATE KEY UPDATE count = " + a.count + ", updated_time = '" + format_date(a.updated_time) + "';");
+											
+											/* Sincronizando informações das fotos de cada álbum modificado. */
+											console.log('Sincronizando fotos do álbum ' + a.id + '...');
+											var album_id = a.id;
+											
+											fb.api('/v2.0/' + album_id + '/photos', function (photos)
+											{
+												if (!photos || photos.error)
+												{
+													console.log('Erro na consulta das fotos!');
+													console.log(error);
+													return;
+												}
+												else
+												{
+													photos.data.forEach(function (p)
+													{
+														connection.query("INSERT INTO myl_fb_photos (photo_id, album_id, source_url, thumbs_url) VALUES (" + p.id + ", " + album_id + ", '" + p.images[0].source + "', '" + p.images[p.images.length - 1].source + "') ON DUPLICATE KEY UPDATE source_url = '" + p.images[0].source + "', thumbs_url = '" + p.images[p.images.length - 1].source + "';");
+													});
+												}
+											});
 										}
 									});
 								}
 							});
-							
-							/* Sincronizando informações das fotos de cada álbum. */
-							/* TODO */
 							
 							console.log('');
 						}
