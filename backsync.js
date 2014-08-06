@@ -69,7 +69,7 @@ function Start() {
 								fb.api('/v2.0/me', function (res)
 								{
 									/* TODO */
-									console.log(res);
+									//console.log(res);
 								});
 							}
 							else
@@ -77,12 +77,27 @@ function Start() {
 								fb.api('/v2.0/' + page_fbid, function (res)
 								{
 									/* TODO */
-									console.log(res);
+									//console.log(res);
 								});
 							}
 							
 							/* Sincronizando informações dos álbuns. */
-							/* TODO */
+							fb.api('/v2.0/me/albums', function (albums)
+							{
+								if (!albums || albums.error)
+								{
+									console.log('Erro na consulta dos álbuns!');
+									console.log(error);
+									return;
+								}
+								else
+								{
+									albums.data.forEach(function (a)
+									{
+										console.log('Sincronizando álbum: ' + a.name + ', fotos: ' + a.count);
+									});
+								}
+							});
 							
 							/* Sincronizando informações das fotos de cada álbum. */
 							/* TODO */
