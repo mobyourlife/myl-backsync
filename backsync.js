@@ -39,9 +39,10 @@ function Start() {
 		else
 		{
 			console.log('Conexão estabelecida com sucesso!');
+	console.log('');
 			
 			/* Consulta os usuários cadastrados. */
-			connection.query("SELECT page_fbid, access_token FROM myl_accounts;", function (error, rows, columns) {
+			connection.query("SELECT admin_uid, page_fbid, access_token FROM myl_accounts;", function (error, rows, columns) {
 				if (error)
 				{
 					console.log('Erro na consulta dos usuários cadastrados!');
@@ -57,9 +58,36 @@ function Start() {
 						{
 							/* Utiliza os tokens dos usuários para sincronização de suas informações. */
 							var page_fbid = rows[i].page_fbid;
+							var is_fanpage = (rows[i].admin_uid != rows[i].page_fbid);
 							fb.setAccessToken(rows[i].access_token);
 							
-							console.log('Sincronizando página ' + page_fbid + '...');
+							console.log('Sincronizando ' + (is_fanpage ? 'página' : 'perfil') + ' ' + page_fbid + '...');
+							
+							/* Sincronizando informações do perfil do usuário. */
+							if (is_fanpage == false)
+							{
+								fb.api('/v2.0/me', function (res)
+								{
+									/* TODO */
+									console.log(res);
+								});
+							}
+							else
+							{
+								fb.api('/v2.0/' + page_fbid, function (res)
+								{
+									/* TODO */
+									console.log(res);
+								});
+							}
+							
+							/* Sincronizando informações dos álbuns. */
+							/* TODO */
+							
+							/* Sincronizando informações das fotos de cada álbum. */
+							/* TODO */
+							
+							console.log('');
 						}
 					}
 					else
