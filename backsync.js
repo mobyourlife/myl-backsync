@@ -162,7 +162,10 @@ function Start() {
 			});
         }
 		
-		return;
+		setTimeout(function() {
+            console.log("Fechando conexão.");
+            connection.end();
+        }, (60 * 1000));
     });
 }
 
